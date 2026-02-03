@@ -1,0 +1,11 @@
+.side-link {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  padding: 10px;
+}
+
+.side-link:hover {
+  background: #444;
+  color: #fff;
+}
