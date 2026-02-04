@@ -1,11 +1,85 @@
-.side-link {
-  display: block;
-  color: #ccc;
-  text-decoration: none;
-  padding: 10px;
+﻿:root {
+  --sidebar-width: 220px;
 }
 
-.side-link:hover {
-  background: #444;
-  color: #fff;
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f6f7fb;
+  color: #1b1b1b;
+}
+
+body.dark-mode {
+  background: #111;
+  color: white;
+}
+
+.dark-card {
+  background: #222;
+  color: white;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+}
+
+.app-content {
+  padding: 20px;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: calc(100vh - 56px);
+  padding: 16px 12px;
+}
+
+.sidebar-light {
+  background: #ffffff;
+  border-right: 1px solid #e2e2e2;
+}
+
+.sidebar-dark {
+  background: #1b1b1b;
+  border-right: 1px solid #333;
+}
+
+.sidebar .nav-link {
+  color: inherit;
+  margin-bottom: 6px;
+}
+
+.sidebar .nav-link:hover {
+  text-decoration: underline;
+}
+
+.sidebar-header {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.quick-link {
+  border: 1px solid #e6e6e6;
+}
+
+body.dark-mode .quick-link,
+body.dark-mode .card,
+body.dark-mode .list-group-item,
+body.dark-mode .table,
+body.dark-mode .form-control,
+body.dark-mode .form-select,
+body.dark-mode .navbar {
+  background: #222;
+  color: white;
+}
+
+body.dark-mode .table {
+  --bs-table-bg: #222;
+  --bs-table-color: #fff;
 }

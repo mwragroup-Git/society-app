@@ -1,58 +1,90 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { addMember, fetchMembers, removeMember } from "../services/fireStoreService";
+﻿import { createContext, useContext, useMemo, useState } from "react";
 
 const SocietyContext = createContext();
 
-export const SocietyProvider = ({ children }) => {
-  const [members, setMembers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+const initialMembers = [
+  { id: 1, name: "Sumith" },
+  { id: 2, name: "Sush" },
+  { id: 3, name: "Aarav" }
+];
 
-  const loadMembers = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const data = await fetchMembers();
-      setMembers(data);
-    } catch (err) {
-      console.error("Failed to load members:", err);
-      setError(err?.message || "Could not load members. Check Firebase config/rules and try again.");
-    } finally {
-      setLoading(false);
-    }
+const initialEvents = [
+  {
+    id: 1,
+    title: "Community Clean-Up Drive",
+    date: "2026-02-10",
+    image: "https://placehold.co/600x400",
+    description: "Join us for a morning clean-up and refreshments."
+  },
+  {
+    id: 2,
+    title: "Festival Night",
+    date: "2026-03-01",
+    image: "https://placehold.co/600x400",
+    description: "Music, food stalls, and family activities."
+  }
+];
+
+const initialComplaints = [
+  { id: 1, title: "Elevator issue", details: "Lift B is making noise.", status: "Pending" },
+  { id: 2, title: "Water leakage", details: "Leak near Block C basement.", status: "In Progress" }
+];
+
+const initialMarketplace = [
+  { id: 1, name: "Dining Table", price: 250, seller: "Kiran", image: "https://placehold.co/400x300" },
+  { id: 2, name: "Bicycle", price: 80, seller: "Meera", image: "https://placehold.co/400x300" },
+  { id: 3, name: "Kids Books", price: 20, seller: "Rahul", image: "https://placehold.co/400x300" }
+];
+
+const initialMaintenance = [
+  { id: 1, month: "January 2026", amount: 120, status: "Paid" },
+  { id: 2, month: "February 2026", amount: 120, status: "Due" },
+  { id: 3, month: "March 2026", amount: 120, status: "Upcoming" }
+];
+
+export function SocietyProvider({ children }) {
+  const [members, setMembers] = useState(initialMembers);
+  const [events, setEvents] = useState(initialEvents);
+  const [complaints, setComplaints] = useState(initialComplaints);
+  const [marketplace, setMarketplace] = useState(initialMarketplace);
+  const [maintenanceBills] = useState(initialMaintenance);
+
+  const addMember = (name) => {
+    if (!name?.trim()) return;
+    setMembers((prev) => [{ id: Date.now(), name: name.trim() }, ...prev]);
   };
 
-  const createMember = async (member) => {
-    try {
-      setError("");
-      await addMember(member);
-      await loadMembers();
-    } catch (err) {
-      console.error("Failed to add member:", err);
-      setError(err?.message || "Could not add member. Check Firebase permissions.");
-    }
-  };
+  const removeMember = (id) => setMembers((prev) => prev.filter((m) => m.id !== id));
 
-  const deleteMember = async (id) => {
-    try {
-      setError("");
-      await removeMember(id);
-      await loadMembers();
-    } catch (err) {
-      console.error("Failed to delete member:", err);
-      setError(err?.message || "Could not delete member. Check Firebase permissions.");
-    }
-  };
+  const addEvent = (event) => setEvents((prev) => [{ id: Date.now(), ...event }, ...prev]);
+  const updateEvent = (id, updates) => setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, ...updates } : e)));
+  const deleteEvent = (id) => setEvents((prev) => prev.filter((e) => e.id !== id));
 
-  useEffect(() => {
-    loadMembers();
-  }, []);
+  const addComplaint = (complaint) => setComplaints((prev) => [{ id: Date.now(), status: "Pending", ...complaint }, ...prev]);
+  const updateComplaintStatus = (id, status) =>
+    setComplaints((prev) => prev.map((c) => (c.id === id ? { ...c, status } : c)));
 
-  return (
-    <SocietyContext.Provider value={{ members, loading, error, createMember, deleteMember }}>
-      {children}
-    </SocietyContext.Provider>
+  const value = useMemo(
+    () => ({
+      members,
+      events,
+      complaints,
+      marketplace,
+      maintenanceBills,
+      addMember,
+      removeMember,
+      addEvent,
+      updateEvent,
+      deleteEvent,
+      addComplaint,
+      updateComplaintStatus
+    }),
+    [members, events, complaints, marketplace, maintenanceBills]
   );
-};
 
-export const useSociety = () => useContext(SocietyContext);
+  return <SocietyContext.Provider value={value}>{children}</SocietyContext.Provider>;
+}
+
+export function useSociety() {
+  return useContext(SocietyContext);
+}

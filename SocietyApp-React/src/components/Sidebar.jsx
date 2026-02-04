@@ -1,24 +1,23 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export default function Sidebar() {
-  const { role } = useAuth();
+export default function Sidebar({ darkMode }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   return (
-    <div className="bg-dark text-white p-3" style={{ width: "230px", minHeight: "100vh" }}>
-      <h5 className="text-center">Menu</h5>
-
-      <Link className="side-link" to="/">🏠 Home</Link>
-      <Link className="side-link" to="/about">📘 Journey</Link>
-      <Link className="side-link" to="/events">🎉 Events</Link>
-      <Link className="side-link" to="/rules">📜 Rules</Link>
-      <Link className="side-link" to="/maintenance">💳 Maintenance</Link>
-      <Link className="side-link" to="/marketplace">🛒 Marketplace</Link>
-      <Link className="side-link" to="/complaints">⚠ Complaints</Link>
-
-      {role === "admin" && (
-        <Link className="side-link" to="/admin">👨‍💼 Admin Dashboard</Link>
-      )}
-    </div>
+    <aside className={`sidebar ${darkMode ? "sidebar-dark" : "sidebar-light"}`}>
+      <div className="sidebar-header">Menu</div>
+      <nav className="nav flex-column">
+        <Link className="nav-link" to="/">Dashboard</Link>
+        <Link className="nav-link" to="/events">Events</Link>
+        <Link className="nav-link" to="/marketplace">Marketplace</Link>
+        <Link className="nav-link" to="/maintenance">Maintenance</Link>
+        <Link className="nav-link" to="/complaints">Complaints</Link>
+        <Link className="nav-link" to="/rules">Rules</Link>
+        <Link className="nav-link" to="/about">About</Link>
+        {isAdmin && <Link className="nav-link" to="/admin">Admin Menu</Link>}
+      </nav>
+    </aside>
   );
 }

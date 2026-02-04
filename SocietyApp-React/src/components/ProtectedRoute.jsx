@@ -1,12 +1,12 @@
-import { Navigate } from "react-router-dom";
+﻿import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function ProtectedRoute({ children, adminOnly = false }) {
-  const { currentUser, role } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (!currentUser) return <Navigate to="/login" />;
-
-  if (adminOnly && role !== "admin") return <Navigate to="/" />;
+  if (loading) return <div className="p-4">Loading...</div>;
+  if (!user) return <Navigate to="/login" />;
+  if (adminOnly && user.role !== "admin") return <Navigate to="/" />;
 
   return children;
 }

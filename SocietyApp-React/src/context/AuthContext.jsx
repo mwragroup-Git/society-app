@@ -1,55 +1,40 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { auth, db, googleProvider } from "../firebase/firebaseConfig";
-
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  signInWithPopup
-} from "firebase/auth";
-
-import { doc, getDoc } from "firebase/firestore";
+﻿import { createContext, useContext, useMemo, useState } from "react";
 
 const AuthContext = createContext();
 
+const dummyUsers = [
+  { id: 1, name: "Admin User", email: "admin@society.local", role: "admin" },
+  { id: 2, name: "Member User", email: "member@society.local", role: "member" }
+];
+
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [role, setRole] = useState("member");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  function login(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
-  }
-
-  async function loginWithGoogle() {
-    const result = await signInWithPopup(auth, googleProvider);
-    return result;
-  }
-
-  function logout() {
-    return signOut(auth);
-  }
-
-  async function fetchRole(uid) {
-    const ref = doc(db, "users", uid);
-    const snap = await getDoc(ref);
-    if (snap.exists()) setRole(snap.data().role);
-  }
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
-      if (user) fetchRole(user.uid);
-    });
-    return unsub;
-  }, []);
-
-  const value = {
-    currentUser,
-    login,
-    loginWithGoogle,
-    logout,
-    role,
+  const login = async (email, password) => {
+    setLoading(true);
+    const found = dummyUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    const nextUser = found || { id: Date.now(), name: email.split("@")[0], email, role: "member" };
+    setUser(nextUser);
+    setLoading(false);
+    return nextUser;
   };
+
+  const loginWithGoogle = async () => {
+    setLoading(true);
+    const nextUser = { id: Date.now(), name: "Google User", email: "google.user@example.com", role: "member", provider: "google" };
+    setUser(nextUser);
+    setLoading(false);
+    return nextUser;
+  };
+
+  const logout = async () => {
+    setLoading(true);
+    setUser(null);
+    setLoading(false);
+  };
+
+  const value = useMemo(() => ({ user, login, loginWithGoogle, logout, loading }), [user, loading]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
